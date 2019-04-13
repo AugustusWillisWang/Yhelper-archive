@@ -142,6 +142,38 @@ TBD
 
 TBD
 
+<!-- Replace the page now. -->
+
+In real world, this extension should query result from server database, and will use Ajax to update webpage dynamically.
+
+For simplify, the chrome extension will now replace yelp page with a local version. 
+
+The structure of 
+
+### Usage
+
+#### Server Side
+
+```py
+# in python 2.7 environment, run:
+python server.py
+```
+
+The server will output the result in stdout when receiving requests from the extension. 
+
+#### Client Side
+
+```
+# input the following URL in Chrome's multifunction bar.
+chrome://extensions/
+
+# enable developer mode
+# `Load Unpacked`
+# choose directory: `......\Yhelper\extension`
+
+# This extension is only available when you are visiting yelp detail page. Click the extension icon and click run script button. It will take some time for the server to crawl and run the classifier.
+```
+
 # Reference
 
 [1] Hutto, C.J. & Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model for Sentiment Analysis of Social Media Text. Eighth International Conference on Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.
@@ -159,6 +191,16 @@ TF+TFS+UF sgd+xgb
 Average Precision is 0.802979.
 Average Recall is 0.717550.
 
+Average Precision is 0.805863.
+Average Recall is 0.717305.
+
+TF+TFS+UF+RF sgd+xgb
+Average Precision is 0.804181.
+Average Recall is 0.713945.
+
+Average Precision is 0.810476.
+Average Recall is 0.726868.
+little improvement
 
 <!-- --- -->
 
