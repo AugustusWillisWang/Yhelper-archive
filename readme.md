@@ -148,6 +148,20 @@ TBD
 
 ---
 
+<!-- # Raw Data -->
+
+UF user feature 
+RF review feature
+TF review text feature 
+TFS review text feature: sentiment score 
+
+TF+TFS+UF sgd+xgb
+Average Precision is 0.802979.
+Average Recall is 0.717550.
+
+
+<!-- --- -->
+
 TODO:
 
 Doc(5-6h): test!!!

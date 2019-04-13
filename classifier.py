@@ -154,6 +154,7 @@ def check(reviews):
     for i in reviews:
         if(i['user_info']['dirty']):
             basic_features.append([0,0,0,0,0,0,0,0,0,0,0,0,0])
+            # basic_features.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
         else:
             i_list=[
                 i['grade'], basic_senti_scores[cnt],
@@ -161,6 +162,9 @@ def check(reviews):
                 i['user_info']['Cool'], i['user_info']['firsts'],
                 i['user_info']['yelp_time_abs'], i['user_info']['review_votes'], i['user_info']['compliment'],
                 i['user_info']['tips'], i['friends'], i['user_info']['followers'], i['photos']
+
+                # review features
+                # ,i['user_info']['Useful_review'], i['user_info']['Cool_review'], i['user_info']['Funny_review'], i['user_info']['review_votes_review'] 
             ]
             basic_features.append(i_list)
             # review_text.append(i['review'])
