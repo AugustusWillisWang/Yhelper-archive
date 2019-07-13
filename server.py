@@ -1,11 +1,13 @@
 # coding=utf-8
 
-# This module is the serverend of the Yhelper Chrome Extension
+# This module is the server side of the Yhelper Chrome Extension
 
 from flask import Flask
 from flask import request
 
 import pageparser
+
+print(r'[Yhelper Server] Package imported')
 
 app = Flask(__name__)
 

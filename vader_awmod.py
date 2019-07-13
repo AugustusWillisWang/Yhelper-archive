@@ -622,10 +622,10 @@ if __name__ == '__main__':
         text_predicts = map_to_label(predict_scores)
 
         # Emoji
-    	emoji_predicts = emoji_model.predict(emoji_feats[train])
+        emoji_predicts = emoji_model.predict(emoji_feats[train])
 
         # Likes, Retweets
-    	# extra_predicts = extra_model.predict(log_extra_array[train])
+        # extra_predicts = extra_model.predict(log_extra_array[train])
 
         # predict=stacking results
         stacking_input=[]
@@ -681,15 +681,15 @@ if __name__ == '__main__':
         text_predicts = map_to_label(predict_scores)
 
         # Emoji
-    	emoji_predicts = emoji_model.predict(emoji_feats[test])
+        emoji_predicts = emoji_model.predict(emoji_feats[test])
 
         # Likes, Retweets
-    	# extra_predicts = extra_model.predict(log_extra_array[test])
+        # extra_predicts = extra_model.predict(log_extra_array[test])
 
         # Ensamble Classifier
         # predicts just add emoji results
 
-    	predicts =[]
+        predicts =[]
 
         # the 1st version of model
         # for a, b in zip(text_predicts, emoji_predicts):

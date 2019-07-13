@@ -4,6 +4,7 @@ import sqlite3
 import re
 
 conn = sqlite3.connect('./data/yelpHotelData.db')
+# conn = sqlite3.connect('./data/yelpResData.db')
 c = conn.cursor()
 print('Opened database successfully.')
 
@@ -32,6 +33,10 @@ def get_review_data(reviewid):
     except:
         dirty_cnt+=1
         print('Dirty review data detected. Total:%d.'%(dirty_cnt))
+        areview['Useful_review']=0
+        areview['Cool_review']=0
+        areview['Funny_review']=0
+        areview['review_votes_review']=0
         areview['dirty_review']=1 
 
     # print(db_command)
@@ -65,6 +70,8 @@ def get_user_data(uid):
     auser['compliment']=res[8]
     auser['tips']=res[8]
     auser['followers']=res[9]
+
+    # auser['reviewID']=res[12]
 
     auser['review_votes']=0
     auser['review_votes']+=auser['Useful']

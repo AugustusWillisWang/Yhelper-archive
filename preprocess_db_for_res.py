@@ -12,7 +12,7 @@ def load_metadata(file):
         metadata.append(data)
     return metadata
 
-metadata=load_metadata('./data/YelpChi/output_meta_yelpHotelData_NRYRcleaned.txt')
+metadata=load_metadata('./data/YelpChi/output_meta_yelpResData_NRYRcleaned.txt')
 res=[]
 cnt=0
 error=0
@@ -32,7 +32,7 @@ for i in metadata:
         print('Error occurred. Current user: %d'%(cnt))
         error+=1
 
-with open('./data/preprocessed/extra_feature.json', 'w') as f:
+with open('./data/preprocessed/extra_feature_res.json', 'w') as f:
     f.write(json.dumps(res))
 
 print('Preprocess(db) finished. %d error(s) occurred.'%(error))

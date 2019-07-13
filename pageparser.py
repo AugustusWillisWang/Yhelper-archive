@@ -21,6 +21,14 @@ html = io.open('./data/YelpWeb/test.html', 'r',  encoding='utf-8').read()
 float_re=re.compile(r'[0-9]+\.?[0-9]*')
 uid_re=re.compile(r'.*userid=(.+)')
 
+def to_int(input_str):
+    try:
+        res = int(input_str)
+    except:
+        res = 0
+    finally:
+        return res
+
 def parse_yelp_page(html):
     print('Parsing yelp pages...')
     soup = BeautifulSoup(html, features="html.parser")
@@ -62,6 +70,7 @@ def parse_yelp_page(html):
         except AttributeError:
             areview['is_elite']=0
 
+
         # review and grade
         stripped_strings = review_wrapper.div.p.stripped_strings
         review=''
@@ -72,6 +81,10 @@ def parse_yelp_page(html):
         areview['grade']=review_wrapper.div.div.div.div['title']
         areview['grade']=int(float(re.match(float_re, areview['grade']).group()))
 
+        areview['Useful_review']=to_int(review_wrapper.find('span', string='Useful').parent.find('span', class_='count').string)
+        areview['Cool_review']=to_int(review_wrapper.find('span', string='Cool').parent.find('span', class_='count').string)
+        areview['Funny_review']=to_int(review_wrapper.find('span', string='Funny').parent.find('span', class_='count').string)
+        areview['review_votes_review'] = areview['Useful_review']+areview['Cool_review']+areview['Funny_review']
         if(areview['is_qype']!=1):
             areview['user_info']=usercrawler.get_user_data(areview['uid'])
         else:

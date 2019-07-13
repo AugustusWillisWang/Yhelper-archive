@@ -1,12 +1,21 @@
 # encoding=utf8
 
-# This module is the classifier.
+# This module is the classifier. Import this module to train or use pretrained classifier.
 # 
+# Usage: 
+# import classifier
+# classifier.load_model()
+# classifier.check(reviews)
 
 # settings-----------------------------
 PARA_TUNING=0
 # PARA_TUNING=1
 # settings-----------------------------
+
+# train dataset-----------------------------
+DATA_SET=0 # hotel
+# DATA_SET=1 # restaurant
+# train dataset-----------------------------
 
 # word2vec ref: https://zhuanlan.zhihu.com/p/24961011
 # TODO: WU: word unigram, 
@@ -17,24 +26,17 @@ PARA_TUNING=0
 # * unigram word2vec
 # * bigrams word2vec
 
-# Additionally, we also try style and part-of-speech (POS)
-# based features which have been shown to be useful for
-# deception detection (Feng et al., 2012b). We consider two
-# types of features: Deep syntax (Feng et al., 2012b) and
-# POS sequence patterns (Mukherjee and Liu, 2010).
-
-# 1Using only behavioral features (BF) boosts precision by
+# "Using only behavioral features (BF) boosts precision by
 # about 20% and recall by around 7% in both domains
 # resulting in around 14% improvement in F1. Thus,
 # behaviors are stronger than linguistic n-grams for
-# detecting real-life fake reviews filtered by Yelp.
+# detecting real-life fake reviews filtered by Yelp."
 
 import os
 import math
 import pickle
 import numpy as np
 import vader_awmod
-import preprocess
 import xgboost as xgb
 import json
 # from sklearn.metrics import mean_squared_error
@@ -94,24 +96,27 @@ def load_model():
     tfidf_vectorizer=pickle.load(model_output3)
 
 def check(reviews):
-    # reviews: {
-    #   'user_info':{
-    #       'dirty':
-    #       'Funny':
-    #       'Useful':
-    #       'Cool':
-    #       'firsts':
-    #       'yelp_time_abs': (2020-yelp_time)
-    #       'review_votes':
-    #       'compliment':
-    #       'tips':
-    #       'followers':
-    #   }
-    #   'review': (review_text)
-    #   'grade':
-    #   'friends':
-    #   'photos':
-    # }
+    '''
+    reviews is a dict with the following format:
+    reviews: {
+        'user_info':{
+            'dirty':
+            'Funny':
+            'Useful':
+            'Cool': 
+            'firsts':
+            'yelp_time_abs': (2020-yelp_time)
+            'review_votes':
+            'compliment':
+            'tips':
+            'followers':
+        }
+        'review': (review_text)
+        'grade':
+        'friends':
+        'photos':
+    }
+    '''
     review_text=[]
     basic_senti_scores = []
 
@@ -153,8 +158,9 @@ def check(reviews):
     cnt=0
     for i in reviews:
         if(i['user_info']['dirty']):
-            basic_features.append([0,0,0,0,0,0,0,0,0,0,0,0,0])
-            # basic_features.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+            # basic_features.append([0,0])
+            # basic_features.append([0,0,0,0,0,0,0,0,0,0,0,0,0])
+            basic_features.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
         else:
             i_list=[
                 i['grade'], basic_senti_scores[cnt],
@@ -164,7 +170,7 @@ def check(reviews):
                 i['user_info']['tips'], i['friends'], i['user_info']['followers'], i['photos']
 
                 # review features
-                # ,i['user_info']['Useful_review'], i['user_info']['Cool_review'], i['user_info']['Funny_review'], i['user_info']['review_votes_review'] 
+                ,i['Useful_review'], i['Cool_review'], i['Funny_review'], i['review_votes_review'] 
             ]
             basic_features.append(i_list)
             # review_text.append(i['review'])
@@ -233,12 +239,18 @@ def get_features(metadata, basic_senti_scores, extra_features):
         data=[i[8], k] # only star ranking
         j_list=[]
         if(j['dirty']):
-            j_list=[0,0,0,0,0,0,0,0,0,0,0]        
+            # j_list=[0,0,0,0,0,0,0,0,0,0,0]        
+            j_list=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]        
+            # j_list=[0,0,0,0]        
+            # j_list=[]        
         else:
             j_list=[
                 j['Funny'], j['Useful'], j['Cool'], j['firsts'],
                 j['yelp_time_abs'], j['review_votes'], j['compliment'],
                 j['tips'], j['friends'], j['followers'], j['photos']
+
+                   # review features
+                ,j['Useful_review'], j['Cool_review'], j['Funny_review'], j['review_votes_review'] 
             ]
         data.extend(j_list)
         res.append(data)
@@ -254,13 +266,26 @@ def main():
 
     # load data
     print("Loading data...")
-    metadata=load_metadata('./data/YelpChi/output_meta_yelpHotelData_NRYRcleaned.txt')
-    review=load_review('./data/YelpChi/output_review_yelpHotelData_NRYRcleaned.txt')
-    preprocessed_review=load_review('./data/preprocessed/reviews_processed.txt')
-    extra_features=load_extra_features('./data/preprocessed/extra_feature.json')
+    metadata=[]
+    review=[]
+    preprocessed_review=[]
+    extra_features=[]
+    if(DATA_SET==0):
+        metadata=load_metadata('./data/YelpChi/output_meta_yelpHotelData_NRYRcleaned.txt')
+        review=load_review('./data/YelpChi/output_review_yelpHotelData_NRYRcleaned.txt')
+        preprocessed_review=load_review('./data/preprocessed/reviews_processed.txt')
+        extra_features=load_extra_features('./data/preprocessed/extra_feature.json')
+    else:
+        metadata=load_metadata('./data/YelpChi/output_meta_yelpResData_NRYRcleaned.txt')
+        review=load_review('./data/YelpChi/output_review_yelpResData_NRYRcleaned.txt')
+        preprocessed_review=load_review('./data/YelpChi/output_review_yelpResData_NRYRcleaned.txt')
+        extra_features=load_extra_features('./data/preprocessed/extra_feature_res.json')
+
     # user_to_review=setup_user_to_review_dict(metadata)
     # review_to_user=setup_review_to_user_dict(metadata)
     groundtruth=get_groundtruth_nparray(metadata)
+
+
 
     i_cnt=0
     y_cnt=0

@@ -1,27 +1,20 @@
-Yhelper: FAKE Review Detection & Applications
+Yhelper
 =======================
 
-(C) 2019 Wang Huaqiang (A0196556M) & Lee Sze Wei (A0180783X) 
+FAKE Review Detection & Applications
+
+* Wang Huaqiang (A0196556M) 
+* Lee Sze Wei (A0180783X) 
 
 ---
 
-[TOC]
-
----
-
-# 1. Description
-
-According to statistics1, 86% of customers read reviews for businesses; positive reviews tend to encourage 65% of customers to use a business while as much as 40% of negative reviews will stop customers from using a business. This indicates the importance of reviews for businesses. However, increasingly, fake reviews have become prevalent. Fake positive reviews could mislead customers into making a purchase with an undeserving business while negative fake reviews could unfairly damage a business' reputations which in turn leads to negative financial impact to the business. 
+## 1. Description
 
 This project aims to detect fake reviews on Yelp from sentiment features and user's social features. The form of this application will be a browser extension. When users browse reviews and grades on Yelp, the extension will point out potential fake reviews.
 
-After enabling this extension on your web browser, the Yelp website will be like this:
-
-![yhelper](./assets/yhelper.png)
-
 ---
 
-# 2. Technology Used
+## 2. Technology Used
 
 * Sentiment analysis. 
 * Fake user detection. 
@@ -29,20 +22,17 @@ After enabling this extension on your web browser, the Yelp website will be like
 
 ---
 
-# 3. Dataset
+## 3. Dataset
 
 The dataset consists of Yelp hotel database holding the below tables:
-* i.	Hotel
-    * This table contains the list of hotel establishments in Yelp
-* ii.	Review
-    * This table contains 5858 reviews submitted to Yelp between Jan 2011 and Sep 2012.  The column 
-* iii.	Reviewer
-    * This table contains the features of the reviewers who have submitted reviews to Yelp.
 
+* i.	Hotel
+* ii.	Review
+* iii.	Reviewer
 
 ---
 
-# 4. Targeted audience
+## 4. Targeted audience
 
 This application has 2 target groups:
 
@@ -52,105 +42,17 @@ This application has 2 target groups:
 
 ---
 
-# 5. Usage
+## Demo
 
-## 5.1. Train and evaluate model 
-
-The local version requires `python2.7` with `sklearn`, `xgb`, and `nltk`. To run the chrome extension and the website, a web framework `flask` is also needed. You can install them via pip.
-
-```
-pip install sklearn
-pip install xgboost
-pip install nltk
-pip install flask
-```
-
-To do preprocess, run:
-```
-python preprocess_db.py
-python preprocess_review.py
-```
-
-Warning: `preprocess_review.py` will take a long time to finish.
-
-To train classifier, run:
-```
-python classifier.py
-```
-
-The trained model will be saved in `model1.data`, `model2.data` and `tfidf-model.data` in `data` folder.
-
-To detect fake reviews from a yelp page, call (in python):
-```py
-import pageparser
-pageparser.detect_fake_review(url)
-```
-
-To call pre-trained classifier, call (in python):
-```py
-import classifier
-classifier.load_model()
-classify_result=classifier.check(reviews)
-# see classifier.py for the structure of `reviews`
-```
-
-You can run:
-```
-python pageparser.py
-```
-
-To run a built-in fake reviews detection unit test. 
-
-For debug: the result will be saved in:
-```
-./data/preprocessed/yelppage.json
-./data/preprocessed/new_yelppage.htm
-```
-
-## 5.2. Website
-
-TBD
-
-## 5.3. Browser Extension (Live demo)
-
-The extension is consisted of two parts: the Chrome extension client side and the python flask server side. The client side will collect info (such as url) when user are browsing yelp and send them to the server side. The server side will do query based on the data from client side, and return the prediction result. Then the client will update the website (point out which review is a potential fake review) according to the server's prediction. 
-
-In real world, this extension should query result from server database, and will use Ajax to update webpage dynamically. But for simplify, the server will now crawl data and run classifier when received a query request, and the chrome extension (client) will then update (replace, in fact) the yelp page. 
-
-Now the server will be setup at `Localhost:5000`. 
-
-
-### 5.3.1. Usage
-
-#### 5.3.1.1. Server Side
-
-```py
-# in python 2.7 environment, run:
-python server.py
-```
-
-The server will output the result in stdout when receiving requests from the extension. 
-
-#### 5.3.1.2. Client Side
-
-```
-# input the following URL in Chrome's multifunction bar.
-chrome://extensions/
-
-# enable developer mode
-# `Load Unpacked`
-# choose directory: `......\Yhelper\extension`
-
-# This extension is only available when you are visiting yelp detail page. 
-# Click the extension icon and click run script button. 
-# It will take some time for the server to crawl and run the classifier.
-```
+* Classifier
+* Extension
+* Website
 
 ---
 
-# 6. Program Structure
+## 6. Program Structure
 
-## 6.1. Training and predicting
+#### 6.1. Training and predicting
 
 ```mermaid
 graph LR
@@ -177,11 +79,7 @@ review_text_preprocess--data-->train
 user_social_features_preprocess--data-->train
 ```
 
-When in training model, the classifier will load marked reviews, and then using the reviews' uid and review ID to search the Yelp open database, get the social feature (and other features) from the database. 
-
-The classifier can run in different places. It can be called in the server end of the Chrome extension, or be called by the website server. In either of thw two ways, the classifier will need preprocessor to help it to get the features it needs.
-
-## 6.2. The whole project
+#### 6.2. The whole project
 
 ```mermaid
 graph LR
@@ -220,34 +118,11 @@ database-->todo
 
 Notes: Dotted line in graph means it shows the data flow in real scene. Solid line in graph means it is the real data flow in live demo.
 
-About how exactly this system works, see `usage::extension`
-
-<!-- TODO: File introduction and comments. -->
-
-## 6.3. Modules Explanation
-
-* Preprocess
-    * yelpdbreader.py `This module is used to interact with the Yelp database`
-    * preprocess_db.py `This module will extract extra feature from Yelp database for marked review data set.`
-    * preprocess_review.py ` This module is used for steming and stopword removing.`
-    * vader_awmod.py `Vader sentiment scorer.`
-* Runtime data crawler
-    * pageparser.py `This module is used to crawl reviews from Yelp.`
-    * user_crawler.py `This module is used to crawl social features from a known user.`
-* Classifier
-    * classifier.py `Classifier define, load and save model.`
-* Chrome Extension
-    * Client Side:
-        * ./extension `Extension file folder. (Client side)`
-    * Server Side(demo):
-        * server.py `Server side for Chrome extension. Will run classify task for all valid post requests.`
-<!-- * get_additional_data.py -->
-
 ---
 
-# 7. Details of Classifier
+## 7. Details of Classifier
 
-## 7.1. Core classifier
+#### 7.1. Core classifier
 
 ```mermaid
 graph TD
@@ -272,7 +147,7 @@ vader_sentiment_model--sentiment_score-->xgboost
 
 As the graph shows, this model is mainly a two level model. Review text, after stemming and vectorizing, will be send to a SVM classifier, it will generate a classify result. In the mean time, a rule based sentiment analyzer will give out the sentiment score for a review. Then we do a late fusion on all the features, we gather user features, review features (see the table below), sentiment score, SVM result together, and use the xgboost model to do the final job.
 
-## 7.2. Notations
+#### 7.2. Notations
 
 * UF: user features, eg: the friend number of a reviewer
 * RF: review features, eg: the number of Useful/Cool remark for a review 
@@ -285,7 +160,7 @@ As the graph shows, this model is mainly a two level model. Review text, after s
 
 <!-- TODO: -->
 
-## 7.3. Full features list
+#### 7.3. Full features list
 
 Following is a list of all the features that we have tried. Not all of them are used in the final model.
 
@@ -312,15 +187,15 @@ UF|photos|The number of photos the user have sent.
 
 <!-- TODO -->
 
-## 7.4. Training Procedure 
+#### 7.4. Training Procedure 
 
 <!-- According to the experience in Lab1, this implementation uses SVM as the basic classifier for emojis. As predictions can not be made only using features like retweet_count, `xx_count` will be introduced in the stacking classifier (Xgboost classifier). -->
 
-### 7.4.1. Parameter Tune
+###### 7.4.1. Parameter Tune
 
 This implementation uses `GridSearchCV` to tune parameters. In `classifier.py` the parameters were already tuned and hard coded. You can refer to `Usage` in this document to tune parameters manually.
 
-### 7.4.2. Training
+###### 7.4.2. Training
 
 The training procedure includes: 
 
@@ -331,11 +206,11 @@ The training procedure includes:
 
 <!-- 1. Training the Neutral Network model  -->
 
-### 7.4.3. Combine Results From Different Regressors (Ensemble Learning: Stacking)
+###### 7.4.3. Combine Results From Different Regressors (Ensemble Learning: Stacking)
 
 This implementation uses `Xgboost` as the stacking regressor. 
 
-## 7.5. Testing Procedure
+#### 7.5. Testing Procedure
 
 The test is a basic 10-fold cross-validation. 
 
@@ -343,9 +218,9 @@ In this scene, what is important is the recall/precision rate for fake reviews. 
 
 ---
 
-# 8. Classification Results
+## 8. Classification Results
 
-## 8.1. Comparison of different features and models
+#### 8.1. Comparison of different features and models
 
 Following results are based on `Hotel` dataset.
 
@@ -368,13 +243,13 @@ We did not choose to use that model because there are many dirty data in that da
 
 <!-- TODO -->
 
-# 9. Result analyze
+## 9. Result analyze
 
-## 9.1. Text Feature is not powerful
+#### 9.1. Text Feature is not powerful
 
 As mentioned in *What Yelp Fake Review Filter Might Be Doing*[3], Text feature alone is not powerful enough, it is far less powerful than the social features (including user features and review features). It's pres/recall result is about 0.2 lower then the result of using social features. Its recall of the fake reviews is less than 0.1 but, what is important is, its precision of the fake reviews is about 0.5 or higher. That means it can figure out some critical patterns in fake reviews, but maybe not all the fake reviews have them. And, as the test result shows, including TF model does improve the final result.
 
-## 9.2. RF: Important feature for real reviews 
+#### 9.2. RF: Important feature for real reviews 
 
 RF (review features) include `cool_vote`, `useful_vote` and `funny_vote`, these features are created by real user. Combining 
 UF and TF, we got the following result:
@@ -385,9 +260,9 @@ TF+TFS+RF|svm(sgd)+xgb|0.802979|0.717550|0.64|0.07
 
 It seems only a little bit better than only using TF. Yet what is important is the recall of the real reviews in this model. It is between 0.99 - 1.00 in all the 10 folds. It proves that how other people think about a review is important because it provides the classifier a review quality score based on human judgement. Inspired by that, we may try more human made features besides other statistical features. 
 
-# 10. Further improvement
+## 10. Further improvement
 
-## 10.1. User graph.
+#### 10.1. User graph.
 
 
 It is also mentioned that using more detailed social features (like social graph) will be of great help for the project. But the problem is our marked data set do not have enough information for use to build a user graph. And it is difficult to crawl it because we have to crawl many pages to build a user network, which will take a great period of time. Also, it is not easy to decide the size of the network need to be built. As a result, for performance consideration, we did not include complex social features in the final version.   
@@ -395,7 +270,7 @@ It is also mentioned that using more detailed social features (like social graph
 <!-- No marked data. -->
 <!-- Need much data. -->
 
-## 10.2. bi-gram / n-gram model
+#### 10.2. bi-gram / n-gram model
 
 <!-- https://scikit-learn.org/stable/modules/feature_extraction.html -->
 
@@ -403,13 +278,13 @@ It is also mentioned that using more detailed social features (like social graph
 
 By introducing n-gram model, we can learn from phrases and multi-word expressions, which may be helpful in fake review detection.
 
-## 10.3. NN
+#### 10.3. NN
 
 <!-- TODO -->
 
 Introducing Neutral Network is another possible way to improve this classifier. A possible idea is using LSTM (Long Short Term Memory networks) or basic RNN, for they can make use of the location information. 
 
-# 11. Reference
+## 11. Reference
 
 <!-- https://www.cs.uic.edu/~liub/FBS/fake-reviews.html -->
 
@@ -427,7 +302,7 @@ Introducing Neutral Network is another possible way to improve this classifier. 
 
 Copyright (c) 2019 Wang Huaqiang
 
-<!-- # Raw Data -->
+<!-- ## Raw Data -->
 
 <!-- 
 TF+TFS
@@ -499,9 +374,9 @@ for Local Service Reviews
 https://ryanmcd.github.io/papers/local_service_summ.pdf
 
 
-## 11.1. Features we can get
+#### 11.1. Features we can get
 
-### 11.1.1. From Profile
+###### 11.1.1. From Profile
 
 * Photo
 * Friends
@@ -527,14 +402,14 @@ https://ryanmcd.github.io/papers/local_service_summ.pdf
 
 TBD: extract feature using a script.
 
-### 11.1.2. User relationship: Graph model
+###### 11.1.2. User relationship: Graph model
 
 Hard to do...
 
-### 11.1.3. From the reviews
+###### 11.1.3. From the reviews
 
 LIWC
 
-## 11.2. Ideas from the paper
+#### 11.2. Ideas from the paper
 
 What Yelp Fake Review Filter Might Be Doing? -->
